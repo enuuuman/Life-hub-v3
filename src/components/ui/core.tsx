@@ -24,10 +24,10 @@ export const NumberInput: React.FC<NumberInputProps> = ({ label, value, onChange
         inputMode="numeric"
         value={formatNumber(value)}
         onChange={(e) => onChange(parseNumber(e.target.value))}
-        className={`w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow text-slate-800 dark:text-slate-100 ${icon ? 'pl-10' : ''}`}
+        className={`w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 ${icon ? 'pl-10' : ''}`}
         placeholder="0"
       />
-      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">円</div>
+      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">万円</div>
     </div>
   </div>
 );
