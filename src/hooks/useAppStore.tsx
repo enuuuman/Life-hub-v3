@@ -6,6 +6,7 @@ interface AppContextType {
   setMode: (mode: AccountMode) => void;
   data: UserData;
   updateData: (newData: Partial<UserData>) => void;
+  loadDemoData: () => void;
   exportBackup: () => void;
   importBackup: (file: File) => Promise<void>;
 }
@@ -16,7 +17,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [mode, setMode] = useState<AccountMode>('personal');
   const [data, setData] = useState<UserData>(INITIAL_USER_DATA);
 
-  // Load data on mode change
   useEffect(() => {
     const key = `lifeHub_v3_${mode}`;
     const saved = localStorage.getItem(key);
@@ -31,13 +31,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [mode]);
 
-  // Save data on change
   const updateData = (newData: Partial<UserData>) => {
     setData(prev => {
       const updated = { ...prev, ...newData };
       localStorage.setItem(`lifeHub_v3_${mode}`, JSON.stringify(updated));
       return updated;
     });
+  };
+
+  const loadDemoData = () => {
+    setData(INITIAL_USER_DATA);
+    localStorage.setItem(`lifeHub_v3_${mode}`, JSON.stringify(INITIAL_USER_DATA));
   };
 
   const exportBackup = () => {
@@ -65,7 +69,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   return (
-    <AppContext.Provider value={{ mode, setMode, data, updateData, exportBackup, importBackup }}>
+    <AppContext.Provider value={{ mode, setMode, data, updateData, loadDemoData, exportBackup, importBackup }}>
       {children}
     </AppContext.Provider>
   );
