@@ -1,73 +1,88 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '../components/ui/core';
 import { useAppStore } from '../hooks/useAppStore';
-import { calcNetWorth, calcMonthlySurplus, getAssetLevel } from '../utils/calculate';
+import { calcNetWorth, calcMonthlySurplus, calcTotalAssets, calcTotalLiabilities, getAssetLevel } from '../utils/calculate';
 import { formatCurrency } from '../utils/format';
-import { Wallet, TrendingUp, ShieldCheck } from 'lucide-react';
+import { Wallet, TrendingUp, ShieldCheck, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const HomeView: React.FC = () => {
   const { data } = useAppStore();
+  const [showPwaGuide, setShowPwaGuide] = useState(false);
+  
   const netWorth = calcNetWorth(data);
+  const totalAssets = calcTotalAssets(data);
+  const totalLiabilities = calcTotalLiabilities(data);
   const surplus = calcMonthlySurplus(data);
-  const level = getAssetLevel(netWorth);
+  const level = getAssetLevel(data);
 
   return (
     <div className="p-5 space-y-6">
-      <section className="text-center space-y-2 mt-4">
-        <p className="text-sm font-medium text-slate-500">純資産総額</p>
-        <h2 className="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight">
+      <section className="text-center space-y-1 mt-2">
+        <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">純資産総額（資産 - 負債）</p>
+        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">
           {formatCurrency(netWorth)}
         </h2>
       </section>
 
-      <Card>
-        <div className="flex justify-between items-end mb-2">
+      <Card className="border-l-4 border-l-indigo-500">
+        <div className="flex justify-between items-start mb-2">
           <div>
-            <p className="text-xs text-slate-500 mb-1">Asset Level</p>
-            <p className={`font-bold text-lg ${level.color}`}>{level.label}</p>
+            <p className="text-xs text-slate-400 font-medium">形成力・家計力評価</p>
+            <p className={`font-bold text-base ${level.color}`}>{level.title}</p>
           </div>
-          <p className="text-sm font-medium text-slate-400">{level.progress}%</p>
+          <span className="text-xs bg-indigo-50 dark:bg-slate-700 px-2 py-1 rounded text-indigo-600 dark:text-indigo-300 font-bold">{level.progress}%</span>
         </div>
-        <div className="h-3 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-1000 ease-out"
-            style={{ width: `${level.progress}%` }}
-          />
+        <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{level.desc}</p>
+        <div className="h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+          <div className="h-full bg-indigo-600 transition-all duration-500" style={{ width: `${level.progress}%` }} />
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="flex flex-col items-center justify-center py-6">
-          <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
-            <TrendingUp size={20} />
-          </div>
-          <p className="text-xs text-slate-500 mb-1">毎月余剰額</p>
-          <p className="font-bold text-slate-800 dark:text-slate-100">{formatCurrency(surplus)}</p>
+      <div className="grid grid-cols-2 gap-3">
+        <Card className="py-4">
+          <p className="text-[11px] text-slate-400 mb-1">毎月余剰資金</p>
+          <p className={`font-bold text-base ${surplus >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+            {formatCurrency(surplus)}/月
+          </p>
         </Card>
-        
-        <Card className="flex flex-col items-center justify-center py-6">
-          <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-3">
-            <Wallet size={20} />
-          </div>
-          <p className="text-xs text-slate-500 mb-1">総資産</p>
-          <p className="font-bold text-slate-800 dark:text-slate-100">
-            {formatCurrency(Object.values(data.assets).reduce((a,b)=>a+b,0))}
+        <Card className="py-4">
+          <p className="text-[11px] text-slate-400 mb-1">総資産 / 負債</p>
+          <p className="font-bold text-xs text-slate-700 dark:text-slate-200">
+            {formatCurrency(totalAssets)}<br />
+            <span className="text-red-500 font-normal">(-{formatCurrency(totalLiabilities)})</span>
           </p>
         </Card>
       </div>
 
       <Card>
-        <div className="flex items-start gap-4">
-          <ShieldCheck className="text-indigo-500 shrink-0 mt-1" size={24} />
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="text-indigo-500 shrink-0 mt-0.5" size={22} />
           <div>
-            <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">AI 診断サマリー</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 mb-1">AI 診断アドバイス</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               {surplus > 0 
-                ? `毎月${formatCurrency(surplus)}の余剰資金があります。これを投資（NISA等）に回すことで、将来の資産形成が大きく加速します。シミュレーションタブで確認しましょう。`
-                : '支出が収入を上回っています。まずは毎月の収支バランスを見直し、固定費の削減を検討しましょう。'}
+                ? `毎月${formatCurrency(surplus)}の黒字が出ています。住宅ローンなどの負債があっても、この余剰資金をNISA等で運用に回すことで長期的な資産拡大が十分に期待できます。`
+                : '現在は収支がマイナスまたはフラットです。まずは固定費を見直し、毎月の余剰資金を生み出す体質へ改善しましょう。'}
             </p>
           </div>
         </div>
+      </Card>
+
+      {/* PWAインストールガイド（折りたたみ式） */}
+      <Card className="bg-slate-900 text-white">
+        <button 
+          onClick={() => setShowPwaGuide(!showPwaGuide)} 
+          className="w-full flex justify-between items-center text-left font-bold text-sm"
+        >
+          <span className="flex items-center gap-2"><HelpCircle size={18} className="text-indigo-400" /> スマホにアプリとして追加する方法</span>
+          {showPwaGuide ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </button>
+        {showPwaGuide && (
+          <div className="mt-3 pt-3 border-t border-slate-800 text-xs space-y-2 text-slate-300 leading-relaxed">
+            <p>📱 <strong>iPhone (Safari):</strong> 画面下部の「共有ボタン（四角から矢印）」を押し、「ホーム画面に追加」を選択してください。</p>
+            <p>🤖 <strong>Android (Chrome):</strong> 右上の「メニュー（縦の三点リーダー）」を押し、「ホーム画面に追加」または「アプリをインストール」を選択してください。</p>
+          </div>
+        )}
       </Card>
     </div>
   );
