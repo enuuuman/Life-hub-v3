@@ -17,40 +17,38 @@ export const InputView: React.FC = () => {
 
   return (
     <div className="p-5 space-y-6">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-white">基本情報入力</h2>
-        <div className="w-20">
-          <label className="text-xs text-slate-500 block mb-1">現在の年齢</label>
+      <div className="flex justify-between items-center mb-1">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white">資産・収支入力</h2>
+        <div className="w-24">
+          <label className="text-[10px] text-slate-400 block mb-1">現在の年齢</label>
           <input 
             type="number" 
             value={data.age || ''}
             onChange={(e) => updateData({ age: parseInt(e.target.value) || 0 })}
-            className="w-full bg-slate-100 dark:bg-slate-800 p-2 rounded-lg text-center font-bold text-slate-800 dark:text-white"
+            className="w-full bg-slate-100 dark:bg-slate-800 p-2 rounded-lg text-center font-bold text-sm text-slate-800 dark:text-white outline-none"
           />
         </div>
       </div>
 
       <Card>
-        <h3 className="font-bold text-indigo-600 mb-4 border-b border-slate-100 pb-2">毎月の収支</h3>
+        <h3 className="font-bold text-xs text-indigo-600 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2">毎月の収支（単位: 万円）</h3>
         <NumberInput label="手取り月収" value={data.cashflow.monthlyIncome} onChange={(v) => updateCashflow('monthlyIncome', v)} />
-        <NumberInput label="毎月の支出" value={data.cashflow.monthlyExpense} onChange={(v) => updateCashflow('monthlyExpense', v)} />
+        <NumberInput label="毎月の総支出" value={data.cashflow.monthlyExpense} onChange={(v) => updateCashflow('monthlyExpense', v)} />
       </Card>
 
       <Card>
-        <h3 className="font-bold text-emerald-600 mb-4 border-b border-slate-100 pb-2">プラスの資産</h3>
-        <NumberInput label="預貯金 (現金)" value={data.assets.cash} onChange={(v) => updateAsset('cash', v)} />
-        <NumberInput label="株式・投資信託 (特定口座等)" value={data.assets.stocks} onChange={(v) => updateAsset('stocks', v)} />
+        <h3 className="font-bold text-xs text-emerald-600 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2">プラスの資産（単位: 万円）</h3>
+        <NumberInput label="現金・預金" value={data.assets.cash} onChange={(v) => updateAsset('cash', v)} />
+        <NumberInput label="株式・投資信託" value={data.assets.stocks} onChange={(v) => updateAsset('stocks', v)} />
         <NumberInput label="NISA・iDeCo" value={data.assets.nisa} onChange={(v) => updateAsset('nisa', v)} />
-        <NumberInput label="その他の資産" value={data.assets.other} onChange={(v) => updateAsset('other', v)} />
+        <NumberInput label="その他資産" value={data.assets.other} onChange={(v) => updateAsset('other', v)} />
       </Card>
 
       <Card>
-        <h3 className="font-bold text-red-500 mb-4 border-b border-slate-100 pb-2">マイナスの資産 (負債)</h3>
+        <h3 className="font-bold text-xs text-red-500 uppercase tracking-wider mb-3 border-b border-slate-100 pb-2">負債（単位: 万円）</h3>
         <NumberInput label="住宅ローン残高" value={data.liabilities.mortgage} onChange={(v) => updateLiability('mortgage', v)} />
-        <NumberInput label="その他の借入" value={data.liabilities.other} onChange={(v) => updateLiability('other', v)} />
+        <NumberInput label="奨学金・その他借入" value={data.liabilities.other} onChange={(v) => updateLiability('other', v)} />
       </Card>
-      
-      <p className="text-xs text-center text-slate-400 mt-4">※ 入力内容は自動的に保存されます</p>
     </div>
   );
 };
